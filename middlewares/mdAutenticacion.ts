@@ -13,6 +13,8 @@ export const validarToken = ( req:Request, res:Response, next:NextFunction )=>{
                 mensaje: "Token incorrecto"
             })
         }   
+
+        req.body.usuario = decode;
         next();
     });
 }

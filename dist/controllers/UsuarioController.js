@@ -7,7 +7,14 @@ const usuario_1 = require("../models/usuario");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 class UsuarioController {
     static getUsuarios(req, res) {
-        usuario_1.Usuario.find({}, 'nombre email img role').exec((error, usuarios) => {
+        let desde = req.query.desde || 0;
+        let limit = req.query.limite || 10;
+        desde = Number(desde);
+        limit = Number(limit);
+        usuario_1.Usuario.find({}, 'nombre email img role')
+            .skip(desde)
+            .limit(limit)
+            .exec((error, usuarios) => {
             if (error) {
                 return res.status(500).json({
                     ok: false,
@@ -15,9 +22,19 @@ class UsuarioController {
                     error: error.message
                 });
             }
-            res.status(200).json({
-                ok: true,
-                usuarios: usuarios
+            usuario_1.Usuario.count((error, total) => {
+                if (error) {
+                    return res.status(500).json({
+                        ok: false,
+                        mensaje: "Error al cargar usuarios",
+                        error: error.message
+                    });
+                }
+                res.status(200).json({
+                    ok: true,
+                    usuarios: usuarios,
+                    total: total
+                });
             });
         });
     }

@@ -8,7 +8,15 @@ export default class UsuarioController{
 
     static getUsuarios(req:Request, res:Response ){
 
-        Usuario.find({}, 'nombre email img role' ).exec(
+        let desde = req.query.desde || 0;
+        let limit = req.query.limite || 10;
+        desde = Number(desde);
+        limit = Number(limit);
+
+        Usuario.find({}, 'nombre email img role' )
+        .skip(desde)
+        .limit(limit)
+        .exec(
         ( error:NativeError , usuarios:Document[] )=>{
 
             if( error ){
@@ -19,9 +27,21 @@ export default class UsuarioController{
                 })
             }
 
-            res.status(200).json({
-                ok:true,
-                usuarios:usuarios
+
+            Usuario.count( ( error:NativeError, total:number )=>{
+                if( error ){
+                    return res.status(500).json({
+                        ok:false,
+                        mensaje: "Error al cargar usuarios",
+                        error: error.message
+                    })
+                }
+
+                res.status(200).json({
+                    ok:true,
+                    usuarios:usuarios,
+                    total : total
+                })
             })
         })
     }

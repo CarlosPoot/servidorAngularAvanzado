@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const usuario_1 = require("../models/usuario");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const Config_1 = __importDefault(require("../clases_sistema/Config"));
 class LoginController {
     static loginUsuario(req, res) {
         let body = req.body;
@@ -30,7 +31,7 @@ class LoginController {
                 });
             }
             usuarioBD.password = ":>";
-            let token = jsonwebtoken_1.default.sign({ usuario: usuarioBD }, "semilla del token", { expiresIn: 6000 });
+            let token = jsonwebtoken_1.default.sign({ usuario: usuarioBD }, Config_1.default.SEED, { expiresIn: 6000 });
             res.status(200).json({
                 ok: true,
                 mensaje: "Usuario logueado correctamente",
